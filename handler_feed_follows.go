@@ -37,3 +37,27 @@ func (cfg *apiConfig) handlerFeedFollowsCreate(w http.ResponseWriter, r *http.Re
 
 	respondWithJSON(w, http.StatusOK, databaseFeedFollowsToFeedFollows(feed_follow))
 }
+
+func (cfg *apiConfig) handlerFeedFollowsDelete(w http.ResponseWriter, r *http.Request, user database.User) {
+
+	feedFollowIDString := r.PathValue("feedFollowID")
+
+	feedFollowID, err := uuid.Parse(feedFollowIDString)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't parse feed follow id")
+		return
+	}
+
+	err = cfg.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
+		ID:     feedFollowID,
+		UserID: user.ID,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't delete feed follow")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, struct{}{})
+}
