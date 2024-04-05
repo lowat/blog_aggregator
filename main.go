@@ -5,7 +5,12 @@ import (
 	"net/http"
 	"os"
 
+	"database/sql"
+
+	"github.com/lowat/blog_aggregator/internal/database"
+
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -15,9 +20,25 @@ func main() {
 	}
 	const filepathRoot = "."
 	port := os.Getenv("PORT")
+	dbURL := os.Getenv("CONN")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Error opening db connection")
+	}
+	dbQueries := database.New(db)
+	apiCfg := apiConfig{
+		DB: dbQueries,
+	}
 	mux := http.NewServeMux()
-	registerPaths(mux)
+	mux.HandleFunc("GET /v1/readiness", handlerReadiness)
+	mux.HandleFunc("GET /v1/err", handlerErr)
+	mux.HandleFunc("POST /v1/users", apiCfg.handlerUsersCreate)
+
 	server := NewServer(port, mux)
 	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
 	log.Fatal(server.ListenAndServe())
+}
+
+type apiConfig struct {
+	DB *database.Queries
 }
