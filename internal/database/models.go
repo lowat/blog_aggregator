@@ -26,3 +26,4 @@ type User struct {
 	Name      string
 	ApiKey    string
 }
+
