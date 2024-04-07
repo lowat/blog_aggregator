@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,22 +27,24 @@ func databaseUserToUser(user database.User) User {
 }
 
 type Feed struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
-	Url       string    `json:"url"`
-	UserID    uuid.UUID `json:"user_id"`
+	ID            uuid.UUID  `json:"id"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+	Name          string     `json:"name"`
+	Url           string     `json:"url"`
+	UserID        uuid.UUID  `json:"user_id"`
+	LastFetchedAt *time.Time `json:"last_fetched_at"`
 }
 
 func databaseFeedToFeed(feed database.Feed) Feed {
 	return Feed{
-		ID:        feed.ID,
-		CreatedAt: feed.CreatedAt,
-		UpdatedAt: feed.UpdatedAt,
-		Name:      feed.Name,
-		Url:       feed.Url,
-		UserID:    feed.UserID,
+		ID:            feed.ID,
+		CreatedAt:     feed.CreatedAt,
+		UpdatedAt:     feed.UpdatedAt,
+		Name:          feed.Name,
+		Url:           feed.Url,
+		UserID:        feed.UserID,
+		LastFetchedAt: nullTimeToTimePtr(feed.LastFetchedAt),
 	}
 }
 
@@ -77,4 +80,23 @@ func databaseFeedFollowsToFeedFollowsArr(feedfollows []database.FeedFollow) []Fe
 		result[i] = databaseFeedFollowsToFeedFollows(feedfollow)
 	}
 	return result
+}
+
+type Feed_FeedFollow struct {
+	Feed        Feed        `json:"feed"`
+	FeedFollows FeedFollows `json:"feed_follow"`
+}
+
+func databaseFeed_FeedFollowsToFeed_FeedFollows(feed database.Feed, feedFollow database.FeedFollow) Feed_FeedFollow {
+	return Feed_FeedFollow{
+		Feed:        databaseFeedToFeed(feed),
+		FeedFollows: databaseFeedFollowsToFeedFollows(feedFollow),
+	}
+}
+
+func nullTimeToTimePtr(t sql.NullTime) *time.Time {
+	if t.Valid {
+		return &t.Time
+	}
+	return nil
 }
