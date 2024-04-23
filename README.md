@@ -1,10 +1,11 @@
-# blog_aggregator
+\# Blog Aggregator
 
 ## Description
-API provides way for users to aggregate blog posts from followed RSS feeds.
+API provides way for users to aggregate blog posts from various followed RSS feeds.
 
 ## Prereqs
-- Postgres database connection
+- Postgres database connection.
+  - Schema for database: https://github.com/lowat/blog_aggregator/tree/main/sql/schema
 - API testing application such as postman
   
 ## Quick Start
