@@ -1,4 +1,4 @@
-\# Blog Aggregator
+# Blog Aggregator
 
 ## Description
 API provides way for users to aggregate blog posts from various followed RSS feeds.
@@ -15,9 +15,13 @@ API provides way for users to aggregate blog posts from various followed RSS fee
   PORT="<port number for server to listen to>"
   CONN=<postgres connection string>
 ```
-- Run the precompiled binary
+- Run the precompiled binary if on **Mac**
 ```
 ./out
+```
+- Else if not on Mac, build the go program and run the binary
+```
+go build -o out && ./out
 ```
 
 ## Endpoints
